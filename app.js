@@ -1,17 +1,72 @@
 const baseUrl = 'http://localhost:5000';
+const taquitosContainer = document.getElementById('taquitos-container');
+
+const btnPostTaco = document.getElementById('btn-post-taco');
+
+const tacosOptions = document.getElementById('taco-option');
+
+const tacoForm = {
+    name: document.getElementById('taco-name'),
+    quantity: document.getElementById('taco-quantity'),
+    pica: document.getElementById('option-spyciness')
+}
+
+btnPostTaco.onclick = ()=>{
+    const taco = {
+        name: tacoForm.name.value,
+        quantity: tacoForm.quantity.value,
+        pica: tacoForm.pica.value
+    }
+
+    AddTaquito(taco);
+};
 
 const GetTaquitos = ()=>{
     const url = baseUrl;
     fetch(url)
     .then(data => data.json())
-    .then(tacos => console.log(tacos));
+    .then(tacos => {
+        taquitosContainer.innerHTML = '';
+        tacosOptions.innerHTML = '';
+        tacos.forEach(taco => {
+            const tacoElement = document.createElement('div');
+            const tacoName = document.createElement('h3');
+            const tacoQuantity = document.createElement('div');
+            const tacoSpyciness = document.createElement('div');
+            const btnDeleteTaco = document.createElement('button');
+            btnDeleteTaco.innerHTML = 'Eliminar x';
+
+            const {name, quantity, pica, id} = taco;
+
+            btnDeleteTaco.onclick = ()=>{
+                DeleteTaquito(id);
+            }
+
+            const tacoOption = document.createElement('option');
+            tacoOption.value = id;
+            tacoOption.innerHTML = name;
+            tacosOptions.appendChild(tacoOption);
+
+            tacoQuantity.innerHTML = `cantidad: ${quantity}`;
+            tacoSpyciness.innerHTML = `¿Es picante?: ${pica}`;
+            tacoName.innerHTML = name;
+            tacoElement.appendChild(tacoName);
+            tacoElement.appendChild(tacoQuantity);
+            tacoElement.appendChild(tacoSpyciness);
+            tacoElement.appendChild(btnDeleteTaco);
+
+            taquitosContainer.appendChild(tacoElement);
+        });
+    });
 };
 
 const GetTaquito = id =>{
     const url = `${baseUrl}/${id}`;
     fetch(url)
     .then(data => data.json())
-    .then(tacos => console.log(tacos));
+    .then(taco => {
+        
+    });
 };
 
 const AddTaquito = taco =>{
@@ -23,7 +78,7 @@ const AddTaquito = taco =>{
             'Content-Type': 'application/json'
         }
     }).then(data => data.json())
-    .then(taco => console.log(taco));
+    .then(taco => GetTaquitos());
 };
 
 const UpdateTaquito = (id, data) =>{
@@ -39,59 +94,20 @@ const UpdateTaquito = (id, data) =>{
     .then(taco => console.log(taco));
 };
 
-const DeleteTaquito = (id) =>{
+const DeleteTaquito = id =>{
     const url = `${baseUrl}/${id}`;
     fetch(url, {
-        method: 'Delete',
+        method: 'DELETE'
+    })
+    .then(_=> {
+        GetTaquitos();
     })
 };
 
-/*GetTaquitos();
-GetTaquito(2);
+GetTaquitos();
 
-const showChanges = async ()=>{
-    await AddTaquito({
-        name: 'canasta',
-        quantity: 3,
-        pica: 'si'
-    });
-    
-    GetTaquitos();
-}
-
-showChanges();*/
-
-UpdateTaquito(1, {
+/*UpdateTaquito(1, {
     name: 'costillita',
     quantity: 6,
     pica: 'no'
-});
-
-DeleteTaquito(3,{
-
-});
-
-const GetTaquitos = async() =>{
-    const response = await fetch(`${baseUrl}`);
-    const data = await response.json();
-
-    const tacoArr = data.map(element =>{
-        const{id, name, quantity, pica} = element;
-        return{taquitoID: id, taquitoName: name, taquitoQuantity: quantity, taquitoPica: pica};
-    });
-
-    tacoArr.forEach(element => {
-        taquitosList.innerHTML +=
-        `<li>
-         <div>${element.taquitoID}</div>
-        <ul>
-        <div>Name: ${element.taquitoName}</div>
-        <div>Quantity: ${element.taquitoQuantity}</div>
-        <div>Pica: ${element.taquitoPica}</div>
-        <ul><br>`;
-    });
-}
-
-GetTaquitos();
-
-const taquitosList = document.getElementById('taquitos-list');
+});*/
